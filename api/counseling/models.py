@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from users.models import *
+from django.conf import settings
+from api.users.models import *
 
 # Create your models here.
 
@@ -20,3 +21,21 @@ class Session(models.Model):
 
     def __str__(self):
         return f"Session with {self.psychologist.username} by {self.student.username} at {self.schedule_time}"
+    
+class SessionLog(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='logs')
+    action = models.CharField(max_length=50)  # e.g., "created", "approved", "rejected"
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Log for session {self.session.id}: {self.action}"
+    
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification to {self.user.username} - {'Read' if self.is_read else 'Unread'}"
