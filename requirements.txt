@@ -2,15 +2,15 @@ asgiref==3.8.1
 async-timeout==5.0.1
 channels==4.2.0
 channels_redis==4.2.1
-Django==4.2.16
+Django==4.2
 django-cors-headers==4.6.0
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
 msgpack==1.1.0
 pillow==11.0.0
 PyJWT==2.9.0
-PyMySQL==1.1.1
 mysqlclient==2.2.0
+# PyMySQL==1.1.1  # Gunakan ini hanya jika mysqlclient tidak bisa dipasang
 python-dotenv==1.0.1
 redis==5.2.1
 sqlparse==0.5.1
