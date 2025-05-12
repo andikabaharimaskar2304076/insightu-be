@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -8,10 +9,13 @@ ROLE_CHOICES = [
 ]
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     is_verified = models.BooleanField(default=False)
 
+    groups = None
+    user_permissions = None
     # Gunakan email sebagai username
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']  # still required by AbstractUser

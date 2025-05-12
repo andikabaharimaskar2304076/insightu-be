@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
@@ -13,6 +14,7 @@ class Session(models.Model):
         ('completed', 'Completed'),
     ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_sessions')
     psychologist = models.ForeignKey(User, on_delete=models.CASCADE, related_name='psychologist_sessions')
     schedule_time = models.DateTimeField()

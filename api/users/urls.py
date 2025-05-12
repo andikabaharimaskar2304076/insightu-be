@@ -10,4 +10,7 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', CurrentUserView.as_view(), name='current_user'),
+    path('psychologist-profile/', PsychologistProfileView.as_view(), name='psychologist_profile'),
+    path('student-profile/', StudentProfileView.as_view(), name='student_profile'),
+    path('verify/<int:user_id>/', VerifyUserView.as_view(), name='verify_user'),
 ]

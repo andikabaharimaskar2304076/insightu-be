@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RegisterSerializer
+from .serializers import *
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
 class RegisterView(APIView):
     def post(self, request):
@@ -24,3 +25,66 @@ class CurrentUserView(APIView):
             "role": user.role,
             "is_verified": user.is_verified
         })
+class StudentProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            profile = request.user.student_profile
+            serializer = StudentProfileSerializer(profile)
+            return Response(serializer.data)
+        except StudentProfile.DoesNotExist:
+            return Response({"detail": "Student profile not found."}, status=404)
+
+    def put(self, request):
+        try:
+            profile = request.user.student_profile
+        except StudentProfile.DoesNotExist:
+            return Response({"detail": "Student profile not found."}, status=404)
+
+        serializer = StudentProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+class PsychologistProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'psychologist':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            profile = request.user.psychologist_profile
+            serializer = PsychologistProfileSerializer(profile)
+            return Response(serializer.data)
+        except PsychologistProfile.DoesNotExist:
+            return Response({"detail": "Psychologist profile not found."}, status=404)
+
+    def put(self, request):
+        if request.user.role != 'psychologist':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            profile = request.user.psychologist_profile
+        except PsychologistProfile.DoesNotExist:
+            return Response({"detail": "Psychologist profile not found."}, status=404)
+
+        serializer = PsychologistProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+class VerifyUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, user_id):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        user.is_verified = True
+        user.save()
+        return Response({'message': f'User {user.email} has been verified.'}, status=status.HTTP_200_OK)
