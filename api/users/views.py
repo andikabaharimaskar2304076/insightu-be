@@ -35,6 +35,20 @@ class StudentProfileView(APIView):
             return Response(serializer.data)
         except StudentProfile.DoesNotExist:
             return Response({"detail": "Student profile not found."}, status=404)
+        
+    def post(self, request):
+        if request.user.role != 'student':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Cek jika sudah punya profil
+        if hasattr(request.user, 'student_profile'):
+            return Response({'detail': 'Profile already exists.'}, status=400)
+
+        serializer = StudentProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # penting: ikat ke user yang login
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
     def put(self, request):
         try:
