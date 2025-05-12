@@ -12,5 +12,7 @@ urlpatterns = [
     path('me/', CurrentUserView.as_view(), name='current_user'),
     path('psychologist-profile/', PsychologistProfileView.as_view(), name='psychologist_profile'),
     path('student-profile/', StudentProfileView.as_view(), name='student_profile'),
-    path('verify/<int:user_id>/', VerifyUserView.as_view(), name='verify_user'),
+    path('verify/<str:user_id>/', VerifyUserView.as_view(), name='verify_user'),
+    path('users-all/', UserListView.as_view(), name='user_list'),
+    path('find/<str:username>/', UserByUsernameView.as_view(), name='find_user_by_username'),
 ]

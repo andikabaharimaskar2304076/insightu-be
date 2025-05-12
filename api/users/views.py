@@ -88,3 +88,32 @@ class VerifyUserView(APIView):
         user.is_verified = True
         user.save()
         return Response({'message': f'User {user.email} has been verified.'}, status=status.HTTP_200_OK)
+class UserListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        users = User.objects.all()
+        serializer = UserSummarySerializer(users, many=True)
+        return Response(serializer.data, status=200)
+class UserByUsernameView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, username):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            'id': str(user.id),
+            'username': user.username,
+            'email': user.email,
+            'role': user.role,
+            'is_verified': user.is_verified
+        }, status=200)

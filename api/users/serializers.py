@@ -30,3 +30,7 @@ class PsychologistProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PsychologistProfile
         fields = ['license_number', 'specialization', 'biography']
+class UserSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'role', 'is_verified']
