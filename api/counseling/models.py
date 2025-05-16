@@ -25,6 +25,7 @@ class Session(models.Model):
         return f"Session with {self.psychologist.username} by {self.student.username} at {self.schedule_time}"
     
 class SessionLog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='logs')
     action = models.CharField(max_length=50)  # e.g., "created", "approved", "rejected"
     description = models.TextField(blank=True)
@@ -34,6 +35,7 @@ class SessionLog(models.Model):
         return f"Log for session {self.session.id}: {self.action}"
     
 class Notification(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
     is_read = models.BooleanField(default=False)

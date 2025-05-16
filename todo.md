@@ -11,16 +11,16 @@ Berikut adalah daftar tugas detail untuk pengembangan back-end berdasarkan fitur
 Pengguna dapat mendaftar, login, dan dibedakan berdasarkan peran (student, psychologist, admin).
 
 ### To-Do
-- [ ] Buat model `User` kustom (`AbstractUser`) dengan `email`, `role`, `is_verified`
-- [ ] Set `AUTH_USER_MODEL` di `settings.py`
-- [ ] Buat serializer:
-  - [ ] `RegisterSerializer`
-  - [ ] `LoginSerializer` (gunakan JWT)
-- [ ] Endpoint:
-  - [ ] `POST /api/register`
-  - [ ] `POST /api/token/`
-  - [ ] `GET /api/me/`
-- [ ] Middleware/decorator untuk cek `role`
+- [v] Buat model `User` kustom (`AbstractUser`) dengan `email`, `role`, `is_verified`
+- [v] Set `AUTH_USER_MODEL` di `settings.py`
+- [v] Buat serializer:
+  - [v] `RegisterSerializer`
+  - [v] `LoginSerializer` (gunakan JWT)
+- [v] Endpoint:
+  - [v] `POST /api/register`
+  - [v] `POST /api/token/`
+  - [v] `GET /api/me/`
+- [v] Middleware/decorator untuk cek `role`
 - [ ] Admin panel untuk verifikasi akun
 
 ---
@@ -31,15 +31,15 @@ Pengguna dapat mendaftar, login, dan dibedakan berdasarkan peran (student, psych
 Pisahkan informasi tambahan untuk siswa dan psikolog.
 
 ### To-Do
-- [ ] Model:
-  - [ ] `StudentProfile` (OneToOne ke `User`)
-  - [ ] `PsychologistProfile` (OneToOne ke `User`)
-- [ ] Serializer:
-  - [ ] `StudentProfileSerializer`
-  - [ ] `PsychologistProfileSerializer`
-- [ ] Endpoint:
-  - [ ] `GET/PUT /api/profile/student/`
-  - [ ] `GET/PUT /api/profile/psychologist/`
+- [v] Model:
+  - [v] `StudentProfile` (OneToOne ke `User`)
+  - [v] `PsychologistProfile` (OneToOne ke `User`)
+- [v] Serializer:
+  - [v] `StudentProfileSerializer`
+  - [v] `PsychologistProfileSerializer`
+- [v] Endpoint:
+  - [v] `GET/PUT /api/profile/student/`
+  - [v] `GET/PUT /api/profile/psychologist/`
 
 ---
 
@@ -49,16 +49,16 @@ Pisahkan informasi tambahan untuk siswa dan psikolog.
 Mahasiswa mengajukan sesi, psikolog merespons.
 
 ### To-Do
-- [ ] Model `Session`:
+- [v] Model `Session`:
   - `student`, `psychologist`, `schedule_time`, `status`, `notes`
-- [ ] `SessionSerializer`
-- [ ] Permission:
+- [v] `SessionSerializer`
+- [v] Permission:
   - Mahasiswa hanya lihat/buat sesi miliknya
   - Psikolog hanya bisa respon sesi miliknya
-- [ ] Endpoint:
-  - [ ] `POST /api/sessions/`
-  - [ ] `GET /api/sessions/`
-  - [ ] `PATCH /api/sessions/<id>/`
+- [v] Endpoint:
+  - [v] `POST /api/sessions/`
+  - [v] `GET /api/sessions/`
+  - [v] `PATCH /api/sessions/<id>/`
 
 ---
 
@@ -68,14 +68,14 @@ Mahasiswa mengajukan sesi, psikolog merespons.
 Memberi tahu pengguna tentang status sesi.
 
 ### To-Do
-- [ ] Model `Notification`
-- [ ] Serializer `NotificationSerializer`
-- [ ] Endpoint:
-  - [ ] `GET /api/notifications/`
-  - [ ] `PATCH /api/notifications/<id>/read/`
-- [ ] Tambahkan notifikasi otomatis saat:
-  - [ ] Sesi dibuat
-  - [ ] Sesi disetujui/ditolak
+- [v] Model `Notification`
+- [v] Serializer `NotificationSerializer`
+- [v] Endpoint:
+  - [v] `GET /api/notifications/`
+  - [v] `PATCH /api/notifications/<id>/read/`
+- [v] Tambahkan notifikasi otomatis saat:
+  - [v] Sesi dibuat
+  - [v] Sesi disetujui/ditolak
 
 ---
 

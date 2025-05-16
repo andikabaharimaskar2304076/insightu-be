@@ -131,3 +131,13 @@ class UserByUsernameView(APIView):
             'role': user.role,
             'is_verified': user.is_verified
         }, status=200)
+class UnverifiedUserListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Permission denied'}, status=403)
+
+        users = User.objects.filter(is_verified=False)
+        serializer = UserSummarySerializer(users, many=True)
+        return Response(serializer.data)
