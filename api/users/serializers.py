@@ -36,7 +36,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         if role == 'student':
             StudentProfile.objects.create(user=user, birth_date=birth_date)
         elif role == 'psychologist':
-            PsychologistProfile.objects.create(user=user)
+            license_number = validated_data.pop('license_number', 'UNKNOWN')
+            PsychologistProfile.objects.create(user=user, license_number=license_number)
 
         return user
 class StudentProfileSerializer(serializers.ModelSerializer):
