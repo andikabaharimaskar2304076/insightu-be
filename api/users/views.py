@@ -141,3 +141,31 @@ class UnverifiedUserListView(APIView):
         users = User.objects.filter(is_verified=False)
         serializer = UserSummarySerializer(users, many=True)
         return Response(serializer.data)
+class UploadAvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        avatar_file = request.FILES.get('avatar')
+
+        if not avatar_file:
+            return Response({'error': 'No avatar uploaded'}, status=400)
+
+        # Simpan avatar ke user.avatar
+        user.avatar = avatar_file
+        user.save()
+
+        # Buat URL absolut dari gambar
+        avatar_url = request.build_absolute_uri(user.avatar.url)
+
+        # Simpan ke profil
+        if hasattr(user, 'student_profile'):
+            profile = user.student_profile
+            profile.address_avatar = avatar_url
+            profile.save()
+        elif hasattr(user, 'psychologist_profile'):
+            profile = user.psychologist_profile
+            profile.address_avatar = avatar_url
+            profile.save()
+
+        return Response({'avatar_url': avatar_url}, status=200)

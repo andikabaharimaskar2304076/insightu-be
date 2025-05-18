@@ -42,12 +42,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 class StudentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
-        fields = ['school_name', 'grade_level', 'birth_date']
+        fields = ['school_name', 'grade_level', 'birth_date', 'nisn', 'homeroom_teacher', 'gender', 'major', 'address_avatar']
 class PsychologistProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PsychologistProfile
         fields = ['license_number', 'specialization', 'biography']
 class UserSummarySerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(read_only=True)
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'role', 'is_verified']

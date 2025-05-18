@@ -12,6 +12,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
 
     groups = None
@@ -29,6 +30,11 @@ class StudentProfile(models.Model):
     school_name = models.CharField(max_length=100, blank=True)
     grade_level = models.CharField(max_length=20, blank=True)
     birth_date = models.DateField(null=True, blank=True)
+    nisn = models.CharField(max_length=20, blank=True, null=True)
+    homeroom_teacher = models.CharField(max_length=100, blank=True, null=True)
+    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')], blank=True, null=True)
+    major = models.CharField(max_length=100, blank=True, null=True)
+    address_avatar = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return f"Profile of {self.user.username}"
@@ -39,6 +45,7 @@ class PsychologistProfile(models.Model):
     license_number = models.CharField(max_length=50)
     specialization = models.CharField(max_length=100, blank=True)
     biography = models.TextField(blank=True)
+    address_avatar = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return f"Psychologist: {self.user.username}"

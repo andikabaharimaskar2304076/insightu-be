@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from django.conf.urls.static import static
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -16,4 +17,5 @@ urlpatterns = [
     path('users-all/', UserListView.as_view(), name='user_list'),
     path('find/<str:username>/', UserByUsernameView.as_view(), name='find_user_by_username'),
     path('admin/users/unverified/', UnverifiedUserListView.as_view(), name='admin_unverified_users'),
-]
+    path('users/upload-avatar/', UploadAvatarView.as_view(), name='upload_avatar'),
+] 
