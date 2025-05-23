@@ -47,7 +47,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
 class PsychologistProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PsychologistProfile
-        fields = ['license_number', 'specialization', 'biography']
+        fields = ['license_number', 'specialization', 'biography', 'address_avatar']
 class UserSummarySerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(read_only=True)
     class Meta:
