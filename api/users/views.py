@@ -5,6 +5,7 @@ from rest_framework import status
 from .serializers import *
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework import generics
 
 class RegisterView(APIView):
     def post(self, request):
@@ -169,3 +170,10 @@ class UploadAvatarView(APIView):
             profile.save()
 
         return Response({'avatar_url': avatar_url}, status=200)
+
+class AvailabilityListAPIView(generics.ListCreateAPIView):
+    serializer_class = AvailabilitySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return PsychologistAvailability.objects.filter(psychologist__user=self.request.user)

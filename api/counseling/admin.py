@@ -6,7 +6,7 @@ app = apps.get_app_config('counseling')
 for model in app.get_models():
     admin.site.register(model)
 
-app = apps.get_app_config('users')
+# app = apps.get_app_config('users')
 
-for model in app.get_models():
-    admin.site.register(model)
+# for model in app.get_models():
+    # admin.site.register(model)

@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 ROLE_CHOICES = [
     ('student', 'Student'),
@@ -49,3 +50,24 @@ class PsychologistProfile(models.Model):
 
     def __str__(self):
         return f"Psychologist: {self.user.username}"
+
+class PsychologistAvailability(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    psychologist = models.ForeignKey('PsychologistProfile', on_delete=models.CASCADE, related_name='availabilities')
+    day_of_week = models.CharField(
+        max_length=10,
+        choices=[
+            ('Monday', 'Monday'),
+            ('Tuesday', 'Tuesday'),
+            ('Wednesday', 'Wednesday'),
+            ('Thursday', 'Thursday'),
+            ('Friday', 'Friday'),
+            ('Saturday', 'Saturday'),
+            ('Sunday', 'Sunday'),
+        ]
+    )
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.psychologist.user.username} - {self.day_of_week}: {self.start_time} to {self.end_time}"

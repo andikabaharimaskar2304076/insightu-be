@@ -53,3 +53,8 @@ class UserSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'role', 'is_verified']
+
+class AvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PsychologistAvailability
+        fields = '__all__'
