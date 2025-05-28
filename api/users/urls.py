@@ -18,5 +18,6 @@ urlpatterns = [
     path('find/<str:username>/', UserByUsernameView.as_view(), name='find_user_by_username'),
     path('admin/users/unverified/', UnverifiedUserListView.as_view(), name='admin_unverified_users'),
     path('users/upload-avatar/', UploadAvatarView.as_view(), name='upload_avatar'),
-    path('availabilities/', AvailabilityListAPIView.as_view(), name='availability-list'),
+    path('availabilities/', AvailabilityAPIView.as_view()),
+    path('availabilities/delete/<str:pk>/', AvailabilityDeleteAPIView.as_view(), name='availability-delete'),
 ] 

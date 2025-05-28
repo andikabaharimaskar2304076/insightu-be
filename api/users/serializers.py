@@ -57,4 +57,4 @@ class UserSummarySerializer(serializers.ModelSerializer):
 class AvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = PsychologistAvailability
-        fields = '__all__'
+        fields = ['id', 'day_of_week', 'start_time', 'end_time']

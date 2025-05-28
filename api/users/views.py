@@ -171,9 +171,82 @@ class UploadAvatarView(APIView):
 
         return Response({'avatar_url': avatar_url}, status=200)
 
-class AvailabilityListAPIView(generics.ListCreateAPIView):
-    serializer_class = AvailabilitySerializer
+class AvailabilityAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return PsychologistAvailability.objects.filter(psychologist__user=self.request.user)
+    def get(self, request):
+        if request.user.role != 'psychologist':
+            return Response({'detail': 'Permission denied'}, status=403)
+
+        availabilities = PsychologistAvailability.objects.filter(psychologist__user=request.user)
+        serializer = AvailabilitySerializer(availabilities, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        if request.user.role != 'psychologist':
+            return Response({'detail': 'Permission denied'}, status=403)
+
+        data = request.data
+        if not isinstance(data, list):
+            return Response({'detail': 'Expected a list of objects.'}, status=400)
+
+        serializer = AvailabilitySerializer(data=data, many=True)
+        if serializer.is_valid():
+            PsychologistAvailability.objects.bulk_create([
+                PsychologistAvailability(
+                    psychologist=request.user.psychologist_profile,
+                    **item
+                ) for item in serializer.validated_data
+            ])
+            return Response({'message': 'Availabilities created successfully'}, status=201)
+
+        return Response(serializer.errors, status=400)
+
+    def put(self, request):
+        if request.user.role != 'psychologist':
+            return Response({'detail': 'Permission denied'}, status=403)
+
+        if isinstance(request.data, list):
+            # Bulk update (optional use case: overwrite all)
+            PsychologistAvailability.objects.filter(psychologist__user=request.user).delete()
+            serializer = AvailabilitySerializer(data=request.data, many=True)
+            if serializer.is_valid():
+                PsychologistAvailability.objects.bulk_create([
+                    PsychologistAvailability(
+                        psychologist=request.user.psychologist_profile,
+                        **item
+                    ) for item in serializer.validated_data
+                ])
+                return Response({'message': 'Availabilities updated'}, status=200)
+            return Response(serializer.errors, status=400)
+
+        else:
+            # Update single item
+            availability_id = request.data.get("id")
+            if not availability_id:
+                return Response({'detail': 'ID is required for update.'}, status=400)
+
+            try:
+                instance = PsychologistAvailability.objects.get(id=(availability_id), psychologist__user=request.user)
+            except PsychologistAvailability.DoesNotExist:
+                return Response({'detail': 'Availability not found.'}, status=404)
+
+            serializer = AvailabilitySerializer(instance, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+class AvailabilityDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        try:
+            psychologist = request.user.psychologist_profile
+            availability = PsychologistAvailability.objects.get(id=pk, psychologist=psychologist)
+            availability.delete()
+            return Response({"message": "Deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+        except PsychologistProfile.DoesNotExist:
+            return Response({"detail": "Psychologist profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        except PsychologistAvailability.DoesNotExist:
+            return Response({"detail": "Availability not found."}, status=status.HTTP_404_NOT_FOUND)
+
