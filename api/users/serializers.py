@@ -44,17 +44,47 @@ class StudentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = ['school_name', 'grade_level', 'birth_date', 'nisn', 'homeroom_teacher', 'gender', 'major', 'address_avatar']
-class PsychologistProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PsychologistProfile
-        fields = ['license_number', 'specialization', 'biography', 'address_avatar']
 class UserSummarySerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'is_verified']
+        fields = ['id', 'username', 'email', 'role', 'is_verified', 'avatar']
+class PsychologistProfileSerializer(serializers.ModelSerializer):
+    user = UserSummarySerializer(read_only=True)
 
+    class Meta:
+        model = PsychologistProfile
+        fields = ['id', 'user', 'license_number', 'specialization', 'biography', 'address_avatar']
 class AvailabilitySerializer(serializers.ModelSerializer):
+    psychologist = PsychologistProfileSerializer(read_only=True)
+
     class Meta:
         model = PsychologistAvailability
-        fields = ['id', 'day_of_week', 'start_time', 'end_time']
+        fields = ['id', 'psychologist', 'day_of_week', 'start_time', 'end_time']
+class PsychologistAvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PsychologistAvailability
+        fields = ['day_of_week', 'start_time', 'end_time']
+class PsychologistWithUserSerializer(serializers.ModelSerializer):
+    user_id = serializers.UUIDField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email')
+    avatar = serializers.ImageField(source='user.avatar', read_only=True)
+    is_verified = serializers.BooleanField(source='user.is_verified')
+    availabilities = PsychologistAvailabilitySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PsychologistProfile
+        fields = [
+            'id',               # ini id dari PsychologistProfile
+            'user_id',          # ini yang digunakan saat booking
+            'username',
+            'email',
+            'avatar',
+            'is_verified',
+            'license_number',
+            'specialization',
+            'biography',
+            'address_avatar',
+            'availabilities',
+        ]

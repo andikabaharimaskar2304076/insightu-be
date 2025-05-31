@@ -14,4 +14,5 @@ urlpatterns = [
     path('<uuid:session_id>/logs/', SessionLogListView.as_view(), name='session_logs'),
     path('notifications/', NotificationListView.as_view(), name='notifications'),
     path('notifications/<uuid:pk>/read/', MarkNotificationReadView.as_view(), name='read_notification'),
+    path('sessions/create/', SessionCreateView.as_view(), name='session-create'),
 ]

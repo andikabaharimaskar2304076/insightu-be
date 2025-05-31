@@ -6,6 +6,8 @@ from .serializers import *
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
+from django.contrib.auth import get_user_model
+from rest_framework.permissions import AllowAny
 
 class RegisterView(APIView):
     def post(self, request):
@@ -250,3 +252,12 @@ class AvailabilityDeleteAPIView(APIView):
         except PsychologistAvailability.DoesNotExist:
             return Response({"detail": "Availability not found."}, status=status.HTTP_404_NOT_FOUND)
 
+User = get_user_model()
+
+class PsychologistWithAvailabilityView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        psychologists = PsychologistProfile.objects.prefetch_related('availabilities').select_related('user')
+        serializer = PsychologistWithUserSerializer(psychologists, many=True)
+        return Response(serializer.data)

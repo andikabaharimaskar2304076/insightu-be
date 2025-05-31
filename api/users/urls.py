@@ -20,4 +20,6 @@ urlpatterns = [
     path('users/upload-avatar/', UploadAvatarView.as_view(), name='upload_avatar'),
     path('availabilities/', AvailabilityAPIView.as_view()),
     path('availabilities/delete/<str:pk>/', AvailabilityDeleteAPIView.as_view(), name='availability-delete'),
+    path('psychologists-with-availability/', PsychologistWithAvailabilityView.as_view(), name='psychologist-with-availability'),
+
 ] 

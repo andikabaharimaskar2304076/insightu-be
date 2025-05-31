@@ -7,7 +7,7 @@ from rest_framework import viewsets, permissions
 from .models import *
 from .serializers import *
 from .permissions import *
-from users.models import User
+from api.users.models import User
 
 # Create your views here.
 
@@ -28,12 +28,11 @@ class SessionCreateView(APIView):
         if request.user.role != 'student':
             return Response({'detail': 'Hanya siswa yang dapat membuat sesi.'}, status=403)
 
-        data = request.data.copy()
-        data['student'] = str(request.user.id)  # secara otomatis menetapkan siswa
-        serializer = SessionSerializer(data=data)
+        serializer = SessionSerializer(data=request.data)
 
         if serializer.is_valid():
-            session = serializer.save()
+            # Sisipkan student langsung sebagai argumen
+            session = serializer.save(student=request.user)
 
             # Buat log
             SessionLog.objects.create(

@@ -8,15 +8,13 @@ from .models import Session
 class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
-        fields = '__all__'
-        read_only_fields = ['id', 'student', 'status', 'notes', 'created_at'] # read only bagi siswa
+        fields = ['id', 'student', 'psychologist', 'schedule_time', 'status', 'notes']
+        read_only_fields = ['id', 'student', 'status']  # student diisi otomatis
 class SessionLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = SessionLog
         fields = ['id', 'session', 'action', 'description', 'created_at']
         read_only_fields = ['id', 'session', 'action', 'description', 'created_at']
-
-
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
