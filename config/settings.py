@@ -106,7 +106,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'users.User'
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Ganti sesuai kebutuhan
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Ganti sesuai kebutuhan
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,

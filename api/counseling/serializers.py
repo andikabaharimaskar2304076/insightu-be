@@ -6,10 +6,24 @@ from rest_framework import serializers
 from .models import Session
 
 class SessionSerializer(serializers.ModelSerializer):
+    student = serializers.SerializerMethodField()
+    psychologist = serializers.SerializerMethodField()
+
     class Meta:
         model = Session
-        fields = ['id', 'student', 'psychologist', 'schedule_time', 'status', 'notes']
-        read_only_fields = ['id', 'student', 'status']  # student diisi otomatis
+        fields = ['id', 'student', 'psychologist', 'schedule_time', 'notes', 'status']
+
+    def get_student(self, obj):
+        return {
+            "id": str(obj.student.id),
+            "username": obj.student.username,
+        }
+
+    def get_psychologist(self, obj):
+        return {
+            "id": str(obj.psychologist.id),
+            "username": obj.psychologist.username,
+        }
 class SessionLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = SessionLog
