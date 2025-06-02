@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import render
+from django.utils.dateparse import parse_datetime
 from rest_framework import viewsets, permissions
 from .models import *
 from .serializers import *
@@ -28,20 +29,45 @@ class SessionCreateView(APIView):
         if request.user.role != 'student':
             return Response({'detail': 'Hanya siswa yang dapat membuat sesi.'}, status=403)
 
-        serializer = SessionSerializer(data=request.data)
+        data = request.data.copy()
+        data['student'] = str(request.user.id)
 
+        # Validasi data wajib
+        schedule_time_str = data.get('schedule_time')
+        psychologist_id = data.get('psychologist')
+        if not schedule_time_str or not psychologist_id:
+            return Response({'detail': 'Data tidak lengkap.'}, status=400)
+
+        # Konversi waktu
+        schedule_time = parse_datetime(schedule_time_str)
+        if not schedule_time:
+            return Response({'detail': 'Format tanggal tidak valid.'}, status=400)
+
+        # Cek apakah sudah ada sesi pada waktu tersebut untuk psikolog yang sama
+        conflict_exists = Session.objects.filter(
+            psychologist_id=psychologist_id,
+            schedule_time=schedule_time,
+            status__in=['pending', 'accepted']
+        ).exists()
+
+        if conflict_exists:
+            return Response(
+                {'detail': 'Waktu ini sudah digunakan oleh sesi lain. Silakan pilih waktu lain.'},
+                status=400
+            )
+
+        # Buat sesi jika tidak ada konflik
+        serializer = SessionSerializer(data=data)
         if serializer.is_valid():
-            # Sisipkan student langsung sebagai argumen
             session = serializer.save(student=request.user)
 
-            # Buat log
+            # Log dan notifikasi
             SessionLog.objects.create(
                 session=session,
                 action='created',
                 description=f'Sesi dibuat oleh siswa {request.user.username}'
             )
 
-            # Kirim notifikasi ke psikolog
             Notification.objects.create(
                 user=session.psychologist,
                 message=f'Ada permintaan sesi baru dari {request.user.username}'

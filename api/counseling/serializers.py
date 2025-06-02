@@ -6,12 +6,17 @@ from rest_framework import serializers
 from .models import Session
 
 class SessionSerializer(serializers.ModelSerializer):
-    student = serializers.SerializerMethodField()
-    psychologist = serializers.SerializerMethodField()
+    student = serializers.SerializerMethodField(read_only=True)
+    psychologist = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role='psychologist'),
+        write_only=True
+    )
+    psychologist_info = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Session
-        fields = ['id', 'student', 'psychologist', 'schedule_time', 'notes', 'status']
+        fields = ['id', 'student', 'psychologist', 'psychologist_info', 'schedule_time', 'notes', 'status']
+        read_only_fields = ['id', 'student', 'status']
 
     def get_student(self, obj):
         return {
@@ -19,11 +24,12 @@ class SessionSerializer(serializers.ModelSerializer):
             "username": obj.student.username,
         }
 
-    def get_psychologist(self, obj):
+    def get_psychologist_info(self, obj):
         return {
             "id": str(obj.psychologist.id),
             "username": obj.psychologist.username,
         }
+
 class SessionLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = SessionLog
