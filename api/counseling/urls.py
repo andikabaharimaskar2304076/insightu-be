@@ -16,4 +16,5 @@ urlpatterns = [
     path('notifications/<uuid:pk>/read/', MarkNotificationReadView.as_view(), name='read_notification'),
     path('sessions/create/', SessionCreateView.as_view(), name='session-create'),
     path('sessions/history/', MySessionListView.as_view(), name='student_session_history'),
+    path('messages/<uuid:user_id>/', ChatMessageListCreateView.as_view(), name='chat_messages'),
 ]

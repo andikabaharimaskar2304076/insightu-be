@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.dateparse import parse_datetime
 from rest_framework import viewsets, permissions
 from .models import *
@@ -162,3 +162,25 @@ class MarkNotificationReadView(APIView):
         notif.is_read = True
         notif.save()
         return Response({'message': 'Notifikasi ditandai sebagai telah dibaca.'})
+class ChatMessageListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = request.user
+        messages = ChatMessage.objects.filter(
+            models.Q(sender=user, receiver_id=user_id) |
+            models.Q(sender_id=user_id, receiver=user)
+        ).order_by('timestamp')
+        serializer = ChatMessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, user_id):
+        sender = request.user
+        receiver = get_object_or_404(User, id=user_id)
+
+        message = request.data.get("message")
+        if not message:
+            return Response({"detail": "Message cannot be empty."}, status=400)
+
+        chat = ChatMessage.objects.create(sender=sender, receiver=receiver, message=message)
+        return Response(ChatMessageSerializer(chat).data, status=201)
