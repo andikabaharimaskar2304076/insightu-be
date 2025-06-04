@@ -36,6 +36,7 @@ class StudentProfile(models.Model):
     gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')], blank=True, null=True)
     major = models.CharField(max_length=100, blank=True, null=True)
     address_avatar = models.URLField(blank=True, null=True)
+    is_complete = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Profile of {self.user.username}"
@@ -47,6 +48,7 @@ class PsychologistProfile(models.Model):
     specialization = models.CharField(max_length=100, blank=True)
     biography = models.TextField(blank=True)
     address_avatar = models.URLField(blank=True, null=True)
+    is_complete = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Psychologist: {self.user.username}"

@@ -54,7 +54,7 @@ class PsychologistProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PsychologistProfile
-        fields = ['id', 'user', 'license_number', 'specialization', 'biography', 'address_avatar']
+        fields = ['id', 'user', 'license_number', 'specialization', 'biography', 'address_avatar', 'is_complete']
 class AvailabilitySerializer(serializers.ModelSerializer):
     psychologist = PsychologistProfileSerializer(read_only=True)
 
@@ -88,3 +88,34 @@ class PsychologistWithUserSerializer(serializers.ModelSerializer):
             'address_avatar',
             'availabilities',
         ]
+class AdminVerificationListSerializer(serializers.ModelSerializer):
+    role = serializers.CharField()
+    is_complete = serializers.SerializerMethodField()
+    profile_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'role', 'is_verified', 'is_complete', 'profile_data']
+
+    def get_is_complete(self, obj):
+        if obj.role == 'student' and hasattr(obj, 'studentprofile'):
+            return obj.studentprofile.is_complete
+        elif obj.role == 'psychologist' and hasattr(obj, 'psychologistprofile'):
+            return obj.psychologistprofile.is_complete
+        return False
+
+    def get_profile_data(self, obj):
+        if obj.role == 'student' and hasattr(obj, 'studentprofile'):
+            return {
+                "nisn": obj.studentprofile.nisn,
+                "gender": obj.studentprofile.gender,
+                "major": obj.studentprofile.major,
+                "homeroom_teacher": obj.studentprofile.homeroom_teacher,
+            }
+        elif obj.role == 'psychologist' and hasattr(obj, 'psychologistprofile'):
+            return {
+                "license_number": obj.psychologistprofile.license_number,
+                "specialization": obj.psychologistprofile.specialization,
+                "biography": obj.psychologistprofile.biography,
+            }
+        return {}

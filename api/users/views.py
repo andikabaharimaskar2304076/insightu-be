@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework.permissions import AllowAny
 
 class RegisterView(APIView):
@@ -88,6 +89,15 @@ class PsychologistProfileView(APIView):
         serializer = PsychologistProfileSerializer(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
+
+            data = serializer.validated_data
+            if data.get('license_number') and data.get('specialization') and data.get('biography'):
+                profile.is_complete = True
+                profile.save()
+            else:
+                profile.is_complete = False
+                profile.save()
+
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 class VerifyUserView(APIView):
@@ -260,4 +270,63 @@ class PsychologistWithAvailabilityView(APIView):
     def get(self, request):
         psychologists = PsychologistProfile.objects.prefetch_related('availabilities').select_related('user')
         serializer = PsychologistWithUserSerializer(psychologists, many=True)
+        return Response(serializer.data)
+class PsychologistVerifyRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        if user.role != 'psychologist':
+            return Response({'detail': 'Hanya psikolog yang dapat mengajukan verifikasi.'}, status=status.HTTP_403_FORBIDDEN)
+
+        if user.is_verified:
+            return Response({'detail': 'Akun Anda sudah terverifikasi.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            profile = PsychologistProfile.objects.get(user=user)
+        except PsychologistProfile.DoesNotExist:
+            return Response({'detail': 'Profil psikolog tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not (profile.license_number and profile.specialization and profile.biography):
+            return Response({'detail': 'Lengkapi profil Anda terlebih dahulu.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # ✅ Tandai sebagai lengkap dan verifikasi user
+        profile.is_complete = True
+        profile.save()
+
+        return Response({'detail': 'Verifikasi berhasil. Akun Anda sekarang terverifikasi.'}, status=status.HTTP_200_OK)
+class StudentVerifyRequestView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        if user.role != 'student':
+            return Response({'detail': 'Hanya siswa yang dapat mengajukan verifikasi.'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            profile = StudentProfile.objects.get(user=user)
+        except StudentProfile.DoesNotExist:
+            return Response({'detail': 'Profil siswa tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+
+        required_fields = [profile.nisn, profile.gender, profile.homeroom_teacher, profile.major]
+        if not all(required_fields):
+            return Response({'detail': 'Lengkapi semua data profil terlebih dahulu.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile.is_complete = True
+        profile.save()
+
+        return Response({'detail': 'Permintaan verifikasi berhasil dikirim. Menunggu persetujuan admin.'}, status=status.HTTP_200_OK)
+class AdminVerificationListView(APIView):
+    def get(self, request):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        users = User.objects.filter(is_verified=False).filter(
+            Q(psychologist_profile__is_complete=True) |
+            Q(student_profile__is_complete=True)
+        ).select_related('psychologist_profile', 'student_profile')
+
+        serializer = AdminVerificationListSerializer(users, many=True)
         return Response(serializer.data)

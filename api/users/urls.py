@@ -21,5 +21,7 @@ urlpatterns = [
     path('availabilities/', AvailabilityAPIView.as_view()),
     path('availabilities/delete/<str:pk>/', AvailabilityDeleteAPIView.as_view(), name='availability-delete'),
     path('psychologists-with-availability/', PsychologistWithAvailabilityView.as_view(), name='psychologist-with-availability'),
-
+    path('psychologist-profile/verify/', PsychologistVerifyRequestView.as_view(), name='psychologist-verify'),
+    path('student-profile/verify/', StudentVerifyRequestView.as_view(), name='student_verify'),
+    path('admin/verifications/', AdminVerificationListView.as_view(), name='admin_verification_list'),
 ] 
