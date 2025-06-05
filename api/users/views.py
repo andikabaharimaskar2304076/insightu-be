@@ -9,6 +9,7 @@ from rest_framework import generics
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.permissions import AllowAny
+from api.counseling.models import *
 
 class RegisterView(APIView):
     def post(self, request):
@@ -330,3 +331,21 @@ class AdminVerificationListView(APIView):
 
         serializer = AdminVerificationListSerializer(users, many=True)
         return Response(serializer.data)
+class AdminStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'admin':
+            return Response({'detail': 'Permission denied'}, status=403)
+
+        total_users = User.objects.count()
+        total_students = User.objects.filter(role='student').count()
+        total_psychologists = User.objects.filter(role='psychologist').count()
+        total_sessions = Session.objects.count()
+
+        return Response({
+            'total_users': total_users,
+            'total_students': total_students,
+            'total_psychologists': total_psychologists,
+            'total_sessions': total_sessions,
+        })

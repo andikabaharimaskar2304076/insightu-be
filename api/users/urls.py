@@ -24,4 +24,5 @@ urlpatterns = [
     path('psychologist-profile/verify/', PsychologistVerifyRequestView.as_view(), name='psychologist-verify'),
     path('student-profile/verify/', StudentVerifyRequestView.as_view(), name='student_verify'),
     path('admin/verifications/', AdminVerificationListView.as_view(), name='admin_verification_list'),
+    path('admin/stats/', AdminStatsView.as_view(), name='admin-stats'),
 ] 
